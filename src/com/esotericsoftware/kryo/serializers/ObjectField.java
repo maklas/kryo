@@ -1,8 +1,5 @@
 package com.esotericsoftware.kryo.serializers;
 
-import static com.esotericsoftware.minlog.Log.TRACE;
-import static com.esotericsoftware.minlog.Log.trace;
-
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.KryoException;
 import com.esotericsoftware.kryo.Registration;
@@ -41,9 +38,6 @@ class ObjectField extends CachedField {
 			// // Push a new scope for generics
 			// kryo.pushGenericsScope(type, new Generics(typeVar2concreteClass));
 			// }
-
-			if (TRACE)
-				trace("kryo", "Write field: " + this + " (" + object.getClass().getName() + ")" + " pos=" + output.position());
 
 			Object value = getField(object);
 
@@ -90,9 +84,7 @@ class ObjectField extends CachedField {
 
 	public void read (Input input, Object object) {
 		try {
-			if (TRACE) trace("kryo", "Read field: " + this + " (" + type.getName() + ")" + " pos=" + input.position());
 			Object value;
-
 			Class concreteType = valueClass;
 			Serializer serializer = this.serializer;
 			if (concreteType == null) {

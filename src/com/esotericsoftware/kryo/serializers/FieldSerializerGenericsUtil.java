@@ -1,22 +1,12 @@
 package com.esotericsoftware.kryo.serializers;
 
-import static com.esotericsoftware.minlog.Log.TRACE;
-import static com.esotericsoftware.minlog.Log.trace;
-
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.lang.reflect.WildcardType;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.esotericsoftware.kryo.Generics;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.serializers.FieldSerializer.CachedField;
+
+import java.lang.reflect.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A few utility methods for using generic type parameters, mostly by FieldSerializer
@@ -24,8 +14,8 @@ import com.esotericsoftware.kryo.serializers.FieldSerializer.CachedField;
  * @author Roman Levenstein <romixlev@gmail.com>
  */
 final class FieldSerializerGenericsUtil {
-	private Kryo kryo;
-	private FieldSerializer serializer;
+	private final Kryo kryo;
+	private final FieldSerializer serializer;
 
 	public FieldSerializerGenericsUtil (FieldSerializer serializer) {
 		this.serializer = serializer;
@@ -52,20 +42,15 @@ final class FieldSerializerGenericsUtil {
 
 		if (typeParams != null && typeParams.length > 0) {
 			Generics genScope;
-			trace("kryo", "Class " + clazz.getName() + " has generic type parameters");
 			int typeVarNum = 0;
 			Map<String, Class> typeVar2concreteClass;
 			typeVar2concreteClass = new HashMap<String, Class>();
 			for (TypeVariable typeVar : typeParams) {
 				String typeVarName = typeVar.getName();
-				if (TRACE) {
-					trace("kryo", "Type parameter variable: name=" + typeVarName + " type bounds=" + Arrays.toString(typeVar.getBounds()));
-				}
 
 				final Class<?> concreteClass = getTypeVarConcreteClass(generics, typeVarNum, typeVarName);
 				if (concreteClass != null) {
 					typeVar2concreteClass.put(typeVarName, concreteClass);
-					if (TRACE) trace("kryo", "Concrete type used for " + typeVarName + " is: " + concreteClass.getName());
 				}
 
 				typeVarNum++;
@@ -82,7 +67,6 @@ final class FieldSerializerGenericsUtil {
 			return generics[typeVarNum];
 		} else {
 			// Otherwise try to derive the information from the current GenericScope
-			if (TRACE) trace("kryo", "Trying to use kryo.getGenericScope");
 			Generics scope = kryo.getGenericsScope();
 			if (scope != null) {
 				return scope.getConcreteClass(typeVarName);
@@ -101,8 +85,6 @@ final class FieldSerializerGenericsUtil {
 				if (concreteClass != null) {
 					fieldClass[0] = concreteClass;
 					fieldGenerics = new Class[] {fieldClass[0]};
-					if (TRACE)
-						trace("kryo", "Determined concrete class of '" + field.getName() + "' to be " + fieldClass[0].getName());
 				}
 			} else if (fieldGenericType instanceof ParameterizedType) {
 				ParameterizedType parameterizedType = (ParameterizedType)fieldGenericType;
@@ -137,9 +119,6 @@ final class FieldSerializerGenericsUtil {
 						} else
 							fieldGenerics[i] = null;
 					}
-					if (TRACE && fieldGenerics != null) {
-						trace("kryo", "Determined concrete class of parametrized '" + field.getName() + "' to be " + fieldGenericType + " where type parameters are " + Arrays.toString(fieldGenerics));
-					}
 				}
 			} else if (fieldGenericType instanceof GenericArrayType) {
 				// TODO: store generics for arrays as well?
@@ -148,9 +127,6 @@ final class FieldSerializerGenericsUtil {
 				Class[] tmpFieldClass = new Class[] {fieldClass[0]};
 				fieldGenerics = computeFieldGenerics(genericComponentType, field, tmpFieldClass);
 				// Kryo.getGenerics(fieldGenericType);
-				if (TRACE && fieldGenerics != null) {
-					trace("kryo", "Determined concrete class of a generic array '" + field.getName() + "' to be " + fieldGenericType + " where type parameters are " + Arrays.toString(fieldGenerics));
-				} else if (TRACE) trace("kryo", "Determined concrete class of '" + field.getName() + "' to be " + fieldGenericType);
 			}
 		}
 
@@ -162,12 +138,6 @@ final class FieldSerializerGenericsUtil {
 		Class[] fieldGenerics;
 		CachedField cachedField;
 		// This is a field with generic type parameters
-		if (TRACE) {
-			trace("kryo", "Field '" + field.getName() + "' of type " + fieldClass[0] + " of generic type " + fieldGenericType);
-		}
-
-		if (TRACE && fieldGenericType != null)
-			trace("kryo", "Field generic type is of class " + fieldGenericType.getClass().getName());
 
 		// Get set of provided type parameters
 
@@ -188,10 +158,6 @@ final class FieldSerializerGenericsUtil {
 			}
 		}
 
-		if (TRACE) {
-			trace("kryo", "Generics scope of field '" + field.getName() + "' of class " + fieldGenericType + " is " + scope);
-		}
-
 		fieldGenerics = computeFieldGenerics(fieldGenericType, field, fieldClass);
 		cachedField = serializer.newMatchingCachedField(field, accessIndex, fieldClass[0], fieldGenericType, fieldGenerics);
 
@@ -200,7 +166,6 @@ final class FieldSerializerGenericsUtil {
 				// If any information about concrete types for generic arguments of current field's type
 				// was deriver, remember it.
 				((ObjectField)cachedField).generics = fieldGenerics;
-				if (TRACE) trace("kryo", "Field generics: " + Arrays.toString(fieldGenerics));
 			}
 		}
 		return cachedField;
@@ -217,13 +182,11 @@ final class FieldSerializerGenericsUtil {
 				return getGenerics(componentType, kryo);
 		}
 		if (!(genericType instanceof ParameterizedType)) return null;
-		if (TRACE) trace("kryo", "Processing generic type " + genericType);
 		Type[] actualTypes = ((ParameterizedType)genericType).getActualTypeArguments();
 		Class[] generics = new Class[actualTypes.length];
 		int count = 0;
 		for (int i = 0, n = actualTypes.length; i < n; i++) {
 			Type actualType = actualTypes[i];
-			if (TRACE) trace("kryo", "Processing actual type " + actualType + " (" + actualType.getClass().getName() + ")");
 			generics[i] = Object.class;
 			if (actualType instanceof Class)
 				generics[i] = (Class)actualType;

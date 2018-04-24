@@ -1,6 +1,5 @@
 package com.esotericsoftware.kryo.serializers;
 
-import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.KryoException;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
@@ -160,13 +159,13 @@ class AsmCacheFields {
 		}
 
 		public Object getField (Object object) throws IllegalArgumentException, IllegalAccessException {
-			if (accessIndex != -1) return ((FieldAccess)access).get(object, accessIndex);
+			if (accessIndex != -1) return access.get(object, accessIndex);
 			throw new KryoException("Unknown acess index");
 		}
 
 		public void setField (Object object, Object value) throws IllegalArgumentException, IllegalAccessException {
 			if (accessIndex != -1)
-				((FieldAccess)access).set(object, accessIndex, value);
+				access.set(object, accessIndex, value);
 			else
 				throw new KryoException("Unknown acess index");
 		}

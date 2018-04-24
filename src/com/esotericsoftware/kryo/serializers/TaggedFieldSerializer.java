@@ -1,8 +1,6 @@
 
 package com.esotericsoftware.kryo.serializers;
 
-import static com.esotericsoftware.minlog.Log.*;
-
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.KryoException;
 import com.esotericsoftware.kryo.io.Input;
@@ -35,7 +33,6 @@ public class TaggedFieldSerializer<T> extends FieldSerializer<T> {
 		for (int i = 0, n = fields.length; i < n; i++) {
 			Field field = fields[i].getField();
 			if (field.getAnnotation(Tag.class) == null) {
-				if (TRACE) trace("kryo", "Ignoring field without tag: " + fields[i]);
 				super.removeField(fields[i]);
 			}
 		}

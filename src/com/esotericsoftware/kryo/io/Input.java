@@ -644,7 +644,7 @@ public class Input extends InputStream {
 
 	/** Reads a 1-5 byte float with reduced precision. */
 	public float readFloat (float precision, boolean optimizePositive) throws KryoException {
-		return readInt(optimizePositive) / (float)precision;
+		return readInt(optimizePositive) / precision;
 	}
 
 	// short
@@ -801,7 +801,7 @@ public class Input extends InputStream {
 
 	/** Reads a 1-9 byte double with reduced precision. */
 	public double readDouble (double precision, boolean optimizePositive) throws KryoException {
-		return readLong(optimizePositive) / (double)precision;
+		return readLong(optimizePositive) / precision;
 	}
 
 	// Methods implementing bulk operations on arrays of primitive types

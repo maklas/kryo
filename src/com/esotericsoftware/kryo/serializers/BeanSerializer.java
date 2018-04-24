@@ -18,8 +18,6 @@ import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.reflectasm.MethodAccess;
 
-import static com.esotericsoftware.minlog.Log.*;
-
 /** Serializes Java beans using bean accessor methods. Only bean properties with both a getter and setter are serialized. This
  * class is not as fast as {@link FieldSerializer} but is much faster and more efficient than Java serialization. Bytecode
  * generation is used to invoke the bean propert methods, if possible.
@@ -92,7 +90,6 @@ public class BeanSerializer<T> extends Serializer<T> {
 		for (int i = 0, n = properties.length; i < n; i++) {
 			CachedProperty property = properties[i];
 			try {
-				if (TRACE) trace("kryo", "Write property: " + property + " (" + type.getName() + ")");
 				Object value = property.get(object);
 				Serializer serializer = property.serializer;
 				if (serializer != null)
@@ -120,7 +117,6 @@ public class BeanSerializer<T> extends Serializer<T> {
 		for (int i = 0, n = properties.length; i < n; i++) {
 			CachedProperty property = properties[i];
 			try {
-				if (TRACE) trace("kryo", "Read property: " + property + " (" + object.getClass() + ")");
 				Object value;
 				Serializer serializer = property.serializer;
 				if (serializer != null)
@@ -186,7 +182,7 @@ public class BeanSerializer<T> extends Serializer<T> {
 				((MethodAccess)access).invoke(object, setterAccessIndex, value);
 				return;
 			}
-			setMethod.invoke(object, new Object[] {value});
+			setMethod.invoke(object, value);
 		}
 	}
 }

@@ -599,7 +599,7 @@ public class IdentityMap<K, V> {
 	}
 
 	static public class Entries<K, V> extends MapIterator<K, V> implements Iterable<Entry<K, V>>, Iterator<Entry<K, V>> {
-		private Entry<K, V> entry = new Entry();
+		private final Entry<K, V> entry = new Entry();
 
 		public Entries (IdentityMap<K, V> map) {
 			super(map);

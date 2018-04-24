@@ -677,7 +677,7 @@ public class ByteBufferInput extends Input {
 
 	/** Reads a 1-5 byte float with reduced precision. */
 	public float readFloat (float precision, boolean optimizePositive) throws KryoException {
-		return readInt(optimizePositive) / (float)precision;
+		return readInt(optimizePositive) / precision;
 	}
 
 	/** Reads a 2 byte short. */
@@ -821,7 +821,7 @@ public class ByteBufferInput extends Input {
 	public boolean readBoolean () throws KryoException {
 		require(1);
 		position++;
-		return niobuffer.get() == 1 ? true : false;
+		return niobuffer.get() == 1;
 	}
 
 	/** Reads a 2 byte char. */
@@ -840,7 +840,7 @@ public class ByteBufferInput extends Input {
 
 	/** Reads a 1-9 byte double with reduced precision. */
 	public double readDouble (double precision, boolean optimizePositive) throws KryoException {
-		return readLong(optimizePositive) / (double)precision;
+		return readLong(optimizePositive) / precision;
 	}
 
 	// Methods implementing bulk operations on arrays of primitive types

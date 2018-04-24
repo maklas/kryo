@@ -665,49 +665,41 @@ public class Output extends OutputStream {
 
 	/** Bulk output of an int array. */
 	public void writeInts (int[] object, boolean optimizePositive) throws KryoException {
-		for (int i = 0, n = object.length; i < n; i++)
-			writeInt(object[i], optimizePositive);
+		for (int anObject : object) writeInt(anObject, optimizePositive);
 	}
 
 	/** Bulk output of an long array. */
 	public void writeLongs (long[] object, boolean optimizePositive) throws KryoException {
-		for (int i = 0, n = object.length; i < n; i++)
-			writeLong(object[i], optimizePositive);
+		for (long anObject : object) writeLong(anObject, optimizePositive);
 	}
 
 	/** Bulk output of an int array. */
 	public void writeInts (int[] object) throws KryoException {
-		for (int i = 0, n = object.length; i < n; i++)
-			writeInt(object[i]);
+		for (int anObject : object) writeInt(anObject);
 	}
 
 	/** Bulk output of an long array. */
 	public void writeLongs (long[] object) throws KryoException {
-		for (int i = 0, n = object.length; i < n; i++)
-			writeLong(object[i]);
+		for (long anObject : object) writeLong(anObject);
 	}
 
 	/** Bulk output of a float array. */
 	public void writeFloats (float[] object) throws KryoException {
-		for (int i = 0, n = object.length; i < n; i++)
-			writeFloat(object[i]);
+		for (float anObject : object) writeFloat(anObject);
 	}
 
 	/** Bulk output of a short array. */
 	public void writeShorts (short[] object) throws KryoException {
-		for (int i = 0, n = object.length; i < n; i++)
-			writeShort(object[i]);
+		for (short anObject : object) writeShort(anObject);
 	}
 
 	/** Bulk output of a char array. */
 	public void writeChars (char[] object) throws KryoException {
-		for (int i = 0, n = object.length; i < n; i++)
-			writeChar(object[i]);
+		for (char anObject : object) writeChar(anObject);
 	}
 
 	/** Bulk output of a double array. */
 	public void writeDoubles (double[] object) throws KryoException {
-		for (int i = 0, n = object.length; i < n; i++)
-			writeDouble(object[i]);
+		for (double anObject : object) writeDouble(anObject);
 	}
 }

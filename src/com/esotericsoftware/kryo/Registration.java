@@ -4,7 +4,6 @@ package com.esotericsoftware.kryo;
 import org.objenesis.instantiator.ObjectInstantiator;
 
 import static com.esotericsoftware.kryo.util.Util.*;
-import static com.esotericsoftware.minlog.Log.*;
 
 /** Describes the {@link Serializer} and class ID to use for a class.
  * @author Nathan Sweet <misc@n4te.com> */
@@ -39,7 +38,6 @@ public class Registration {
 	public void setSerializer (Serializer serializer) {
 		if (serializer == null) throw new IllegalArgumentException("serializer cannot be null.");
 		this.serializer = serializer;
-		if (TRACE) trace("kryo", "Update registered serializer: " + type.getName() + " (" + serializer.getClass().getName() + ")");
 	}
 
 	/** @return May be null if not yet set. */

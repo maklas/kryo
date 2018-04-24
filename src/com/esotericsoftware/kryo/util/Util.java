@@ -1,8 +1,6 @@
 
 package com.esotericsoftware.kryo.util;
 
-import static com.esotericsoftware.minlog.Log.*;
-
 /** A few utility methods, mostly for private use.
  * @author Nathan Sweet <misc@n4te.com> */
 public class Util {
@@ -66,35 +64,6 @@ public class Util {
 			|| type == Character.class || type == Short.class || type == Double.class;
 	}
 
-	/** Logs a message about an object. The log level and the string format of the object depend on the object type. */
-	static public void log (String message, Object object) {
-		if (object == null) {
-			if (TRACE) trace("kryo", message + ": null");
-			return;
-		}
-		Class type = object.getClass();
-		if (type.isPrimitive() || type == Boolean.class || type == Byte.class || type == Character.class || type == Short.class
-			|| type == Integer.class || type == Long.class || type == Float.class || type == Double.class || type == String.class) {
-			if (TRACE) trace("kryo", message + ": " + string(object));
-		} else {
-			debug("kryo", message + ": " + string(object));
-		}
-	}
-
-	/** Returns the object formatted as a string. The format depends on the object's type and whether {@link Object#toString()} has
-	 * been overridden. */
-	static public String string (Object object) {
-		if (object == null) return "null";
-		Class type = object.getClass();
-		if (type.isArray()) return className(type);
-		try {
-			if (type.getMethod("toString", new Class[0]).getDeclaringClass() == Object.class)
-				return TRACE ? className(type) : type.getSimpleName();
-		} catch (Exception ignored) {
-		}
-		return String.valueOf(object);
-	}
-
 	/** Returns the class formatted as a string. The format varies depending on the type. */
 	static public String className (Class type) {
 		if (type.isArray()) {
@@ -142,7 +111,7 @@ public class Util {
 	/** Converts a "long" value between endian systems. */
 	static public long swapLong(long value) {
         return
-            ( ( ( value >> 0 ) & 0xff ) << 56 )|
+            ( ( value & 0xff ) << 56 )|
             ( ( ( value >> 8 ) & 0xff ) << 48 )|
             ( ( ( value >> 16 ) & 0xff ) << 40 )|
             ( ( ( value >> 24 ) & 0xff ) << 32 )|

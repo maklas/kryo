@@ -9,7 +9,7 @@ import java.util.Arrays;
 public class IntArray {
 	public int[] items;
 	public int size;
-	public boolean ordered;
+	public final boolean ordered;
 
 	/** Creates an ordered array with a capacity of 16. */
 	public IntArray () {

@@ -2,7 +2,6 @@
 package com.esotericsoftware.kryo;
 
 import static com.esotericsoftware.kryo.util.Util.*;
-import static com.esotericsoftware.minlog.Log.*;
 
 import com.esotericsoftware.kryo.factories.PseudoSerializerFactory;
 import com.esotericsoftware.kryo.factories.ReflectionSerializerFactory;
@@ -55,7 +54,6 @@ import com.esotericsoftware.kryo.serializers.FieldSerializer;
 import com.esotericsoftware.kryo.serializers.MapSerializer;
 import com.esotericsoftware.kryo.util.DefaultClassResolver;
 import com.esotericsoftware.kryo.util.DefaultStreamFactory;
-import com.esotericsoftware.kryo.util.FastestStreamFactory;
 import com.esotericsoftware.kryo.util.IdentityMap;
 import com.esotericsoftware.kryo.util.IntArray;
 import com.esotericsoftware.kryo.util.MapReferenceResolver;
@@ -73,7 +71,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.ConcurrentModificationException;
 import java.util.Currency;
 import java.util.Date;
 import java.util.EnumSet;
@@ -98,7 +95,7 @@ public class Kryo {
 	static private final int NO_REF = -2;
 
 	private SerializerFactory defaultSerializer = new ReflectionSerializerFactory(FieldSerializer.class);
-	private final ArrayList<DefaultSerializerEntry> defaultSerializers = new ArrayList(32);
+	private final ArrayList<DefaultSerializerEntry> defaultSerializers = new ArrayList<DefaultSerializerEntry>(32);
 	private final int lowPriorityDefaultSerializerCount;
 
 	private final ClassResolver classResolver;
@@ -416,13 +413,6 @@ public class Kryo {
 	public Registration register (Registration registration) {
 		int id = registration.getId();
 		if (id < 0) throw new IllegalArgumentException("id must be > 0: " + id);
-
-		Registration existing = getRegistration(registration.getId());
-		if (DEBUG && existing != null && existing.getType() != registration.getType()) {
-			debug("An existing registration with a different type already uses ID: " + registration.getId()
-				+ "\nExisting registration: " + existing + "\nUnable to set registration: " + registration);
-		}
-
 		return classResolver.register(registration);
 	}
 
@@ -501,7 +491,6 @@ public class Kryo {
 				getRegistration(object.getClass()).getSerializer().setGenerics(this, null);
 				return;
 			}
-			if (TRACE || (DEBUG && depth == 1)) log("Write", object);
 			getRegistration(object.getClass()).getSerializer().write(this, output, object);
 		} finally {
 			if (--depth == 0 && autoReset) reset();
@@ -519,7 +508,6 @@ public class Kryo {
 				serializer.setGenerics(this, null);
 				return;
 			}
-			if (TRACE || (DEBUG && depth == 1)) log("Write", object);
 			serializer.write(this, output, object);
 		} finally {
 			if (--depth == 0 && autoReset) reset();
@@ -540,13 +528,11 @@ public class Kryo {
 				}
 			} else if (!serializer.getAcceptsNull()) {
 				if (object == null) {
-					if (TRACE || (DEBUG && depth == 1)) log("Write", object);
 					output.writeByte(NULL);
 					return;
 				}
 				output.writeByte(NOT_NULL);
 			}
-			if (TRACE || (DEBUG && depth == 1)) log("Write", object);
 			serializer.write(this, output, object);
 		} finally {
 			if (--depth == 0 && autoReset) reset();
@@ -567,13 +553,11 @@ public class Kryo {
 				}
 			} else if (!serializer.getAcceptsNull()) {
 				if (object == null) {
-					if (TRACE || (DEBUG && depth == 1)) log("Write", null);
 					output.writeByte(NULL);
 					return;
 				}
 				output.writeByte(NOT_NULL);
 			}
-			if (TRACE || (DEBUG && depth == 1)) log("Write", object);
 			serializer.write(this, output, object);
 		} finally {
 			if (--depth == 0 && autoReset) reset();
@@ -595,7 +579,6 @@ public class Kryo {
 				registration.getSerializer().setGenerics(this, null);
 				return;
 			}
-			if (TRACE || (DEBUG && depth == 1)) log("Write", object);
 			registration.getSerializer().write(this, output, object);
 		} finally {
 			if (--depth == 0 && autoReset) reset();
@@ -606,7 +589,6 @@ public class Kryo {
 	 * @return true if no bytes need to be written for the object. */
 	boolean writeReferenceOrNull (Output output, Object object, boolean mayBeNull) {
 		if (object == null) {
-			if (TRACE || (DEBUG && depth == 1)) log("Write", null);
 			output.writeVarInt(Kryo.NULL, true);
 			return true;
 		}
@@ -620,7 +602,6 @@ public class Kryo {
 
 		// If not the first time encountered, only write reference ID.
 		if (id != -1) {
-			if (DEBUG) debug("kryo", "Write object reference " + id + ": " + string(object));
 			output.writeVarInt(id + 2, true); // + 2 because 0 and 1 are used for NULL and NOT_NULL.
 			return true;
 		}
@@ -628,7 +609,6 @@ public class Kryo {
 		// Otherwise write NOT_NULL and then the object bytes.
 		id = referenceResolver.addWrittenObject(object);
 		output.writeVarInt(NOT_NULL, true);
-		if (TRACE) trace("kryo", "Write initial object reference " + id + ": " + string(object));
 		return false;
 	}
 
@@ -658,7 +638,6 @@ public class Kryo {
 				if (stackSize == readReferenceIds.size) reference(object);
 			} else
 				object = (T)getRegistration(type).getSerializer().read(this, input, type);
-			if (TRACE || (DEBUG && depth == 1)) log("Read", object);
 			return object;
 		} finally {
 			if (--depth == 0 && autoReset) reset();
@@ -680,7 +659,6 @@ public class Kryo {
 				if (stackSize == readReferenceIds.size) reference(object);
 			} else
 				object = (T)serializer.read(this, input, type);
-			if (TRACE || (DEBUG && depth == 1)) log("Read", object);
 			return object;
 		} finally {
 			if (--depth == 0 && autoReset) reset();
@@ -703,12 +681,10 @@ public class Kryo {
 			} else {
 				Serializer serializer = getRegistration(type).getSerializer();
 				if (!serializer.getAcceptsNull() && input.readByte() == NULL) {
-					if (TRACE || (DEBUG && depth == 1)) log("Read", null);
 					return null;
 				}
 				object = (T)serializer.read(this, input, type);
 			}
-			if (TRACE || (DEBUG && depth == 1)) log("Read", object);
 			return object;
 		} finally {
 			if (--depth == 0 && autoReset) reset();
@@ -731,12 +707,10 @@ public class Kryo {
 				if (stackSize == readReferenceIds.size) reference(object);
 			} else {
 				if (!serializer.getAcceptsNull() && input.readByte() == NULL) {
-					if (TRACE || (DEBUG && depth == 1)) log("Read", null);
 					return null;
 				}
 				object = (T)serializer.read(this, input, type);
 			}
-			if (TRACE || (DEBUG && depth == 1)) log("Read", object);
 			return object;
 		} finally {
 			if (--depth == 0 && autoReset) reset();
@@ -762,7 +736,6 @@ public class Kryo {
 				if (stackSize == readReferenceIds.size) reference(object);
 			} else
 				object = registration.getSerializer().read(this, input, type);
-			if (TRACE || (DEBUG && depth == 1)) log("Read", object);
 			return object;
 		} finally {
 			if (--depth == 0 && autoReset) reset();
@@ -778,7 +751,6 @@ public class Kryo {
 		if (mayBeNull) {
 			id = input.readVarInt(true);
 			if (id == Kryo.NULL) {
-				if (TRACE || (DEBUG && depth == 1)) log("Read", null);
 				readObject = null;
 				return REF;
 			}
@@ -796,14 +768,12 @@ public class Kryo {
 		if (id == NOT_NULL) {
 			// First time object has been encountered.
 			id = referenceResolver.nextReadId(type);
-			if (TRACE) trace("kryo", "Read initial object reference " + id + ": " + className(type));
 			readReferenceIds.add(id);
 			return readReferenceIds.size;
 		}
 		// The id is an object reference.
 		id -= 2; // - 2 because 0 and 1 are used for NULL and NOT_NULL.
 		readObject = referenceResolver.getReadObject(type, id);
-		if (DEBUG) debug("kryo", "Read object reference " + id + ": " + string(readObject));
 		return REF;
 	}
 
@@ -839,8 +809,6 @@ public class Kryo {
 
 		copyDepth = 0;
 		if (originalToCopy != null) originalToCopy.clear(2048);
-
-		if (TRACE) trace("kryo", "Object graph complete.");
 	}
 
 	/** Returns a deep copy of the object. Serializers for the classes involved must support {@link Serializer#copy(Kryo, Object)}.
@@ -861,7 +829,6 @@ public class Kryo {
 			else
 				copy = getSerializer(object.getClass()).copy(this, object);
 			if (needsCopyReference != null) reference(copy);
-			if (TRACE || (DEBUG && copyDepth == 1)) log("Copy", copy);
 			return (T)copy;
 		} finally {
 			if (--copyDepth == 0) reset();
@@ -887,7 +854,6 @@ public class Kryo {
 			else
 				copy = serializer.copy(this, object);
 			if (needsCopyReference != null) reference(copy);
-			if (TRACE || (DEBUG && copyDepth == 1)) log("Copy", copy);
 			return (T)copy;
 		} finally {
 			if (--copyDepth == 0) reset();
@@ -913,7 +879,6 @@ public class Kryo {
 			else
 				copy = getSerializer(object.getClass()).copy(this, object);
 			if (needsCopyReference != null) reference(copy);
-			if (TRACE || (DEBUG && copyDepth == 1)) log("Shallow copy", copy);
 			return (T)copy;
 		} finally {
 			copyShallow = false;
@@ -940,7 +905,6 @@ public class Kryo {
 			else
 				copy = serializer.copy(this, object);
 			if (needsCopyReference != null) reference(copy);
-			if (TRACE || (DEBUG && copyDepth == 1)) log("Shallow copy", copy);
 			return (T)copy;
 		} finally {
 			copyShallow = false;
@@ -951,12 +915,6 @@ public class Kryo {
 	// --- Utility ---
 
 	private void beginObject () {
-		if (DEBUG) {
-			if (depth == 0)
-				thread = Thread.currentThread();
-			else if (thread != Thread.currentThread())
-				throw new ConcurrentModificationException("Kryo must not be accessed concurrently by multiple threads.");
-		}
 		if (depth == maxDepth) throw new KryoException("Max depth exceeded: " + depth);
 		depth++;
 	}
@@ -990,7 +948,6 @@ public class Kryo {
 	 * of needing to know the classes to be serialized up front. */
 	public void setRegistrationRequired (boolean registrationRequired) {
 		this.registrationRequired = registrationRequired;
-		if (TRACE) trace("kryo", "Registration required: " + registrationRequired);
 	}
 
 	public boolean isRegistrationRequired () {
@@ -1005,7 +962,6 @@ public class Kryo {
 		if (references == this.references) return references;
 		this.references = references;
 		if (references && referenceResolver == null) referenceResolver = new MapReferenceResolver();
-		if (TRACE) trace("kryo", "References: " + references);
 		return !references;
 	}
 
@@ -1022,7 +978,6 @@ public class Kryo {
 		if (referenceResolver == null) throw new IllegalArgumentException("referenceResolver cannot be null.");
 		this.references = true;
 		this.referenceResolver = referenceResolver;
-		if (TRACE) trace("kryo", "Reference resolver: " + referenceResolver.getClass().getName());
 	}
 
 	public boolean getReferences () {
@@ -1123,7 +1078,6 @@ public class Kryo {
 	}
 
 	public void pushGenericsScope (Class type, Generics generics) {
-		if (TRACE) trace("kryo", "Settting a new generics scope for class " + type.getName() + ": " + generics);
 		Generics currentScope = genericsScope;
 		if (generics.getParentScope() != null) {
 			generics = new Generics(generics.getMappings());

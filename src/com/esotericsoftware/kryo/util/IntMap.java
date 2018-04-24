@@ -653,7 +653,7 @@ public class IntMap<V> {
 	}
 
 	static public class Entries<V> extends MapIterator<V> implements Iterable<Entry<V>>, Iterator<Entry<V>> {
-		private Entry<V> entry = new Entry();
+		private final Entry<V> entry = new Entry();
 
 		public Entries (IntMap map) {
 			super(map);

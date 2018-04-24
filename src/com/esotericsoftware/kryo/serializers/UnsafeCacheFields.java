@@ -7,7 +7,6 @@ import java.lang.reflect.Field;
 
 import sun.misc.Unsafe;
 
-import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.KryoException;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
@@ -16,7 +15,6 @@ import com.esotericsoftware.kryo.io.UnsafeMemoryInput;
 import com.esotericsoftware.kryo.io.UnsafeMemoryOutput;
 import com.esotericsoftware.kryo.io.UnsafeOutput;
 import com.esotericsoftware.kryo.serializers.FieldSerializer.CachedField;
-import com.esotericsoftware.reflectasm.FieldAccess;
 
 /*** Implementations of sun.misc.Unsafe-based serializers for fields.
  * 

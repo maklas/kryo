@@ -20,7 +20,7 @@ import com.esotericsoftware.kryo.io.UnsafeOutput;
  */
 public class FastestStreamFactory implements StreamFactory {
 	
-	static private boolean isUnsafe = UnsafeUtil.unsafe() != null;
+	static private final boolean isUnsafe = UnsafeUtil.unsafe() != null;
 
 	@Override
 	public Input getInput() {

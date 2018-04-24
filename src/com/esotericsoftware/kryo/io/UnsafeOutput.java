@@ -1,8 +1,6 @@
 
 package com.esotericsoftware.kryo.io;
 
-import java.io.DataOutput;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteOrder;
 
@@ -243,7 +241,7 @@ public final class UnsafeOutput extends Output {
 		}
 
 		varInt |= (0x80 << 24);
-		long varLong = varInt | (((long)value) << 32);
+		long varLong = varInt | (value << 32);
 
 		value >>>= 7;
 
@@ -254,7 +252,7 @@ public final class UnsafeOutput extends Output {
 		}
 
 		varLong |= (0x80 << 32);
-		varLong = varInt | (((long)value) << 40);
+		varLong = varInt | (value << 40);
 
 		value >>>= 7;
 
@@ -265,7 +263,7 @@ public final class UnsafeOutput extends Output {
 		}
 
 		varLong |= (0x80 << 40);
-		varLong = varInt | (((long)value) << 48);
+		varLong = varInt | (value << 48);
 
 		value >>>= 7;
 
@@ -276,7 +274,7 @@ public final class UnsafeOutput extends Output {
 		}
 
 		varLong |= (0x80 << 48);
-		varLong = varInt | (((long)value) << 56);
+		varLong = varInt | (value << 56);
 
 		value >>>= 7;
 

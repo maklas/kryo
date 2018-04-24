@@ -1,11 +1,9 @@
 
 package com.esotericsoftware.kryo.io;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 import com.esotericsoftware.kryo.KryoException;
-import com.esotericsoftware.kryo.util.UnsafeUtil;
 
 import static com.esotericsoftware.kryo.util.UnsafeUtil.*;
 

@@ -1,8 +1,5 @@
 package com.esotericsoftware.kryo.util;
 
-import static com.esotericsoftware.kryo.util.UnsafeUtil.unsafe;
-import static com.esotericsoftware.minlog.Log.*;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
@@ -60,12 +57,9 @@ public class UnsafeUtil {
 				tmpFloatArrayBaseOffset = tmpUnsafe.arrayBaseOffset(float[].class);
 				tmpLongArrayBaseOffset = tmpUnsafe.arrayBaseOffset(long[].class);
 				tmpDoubleArrayBaseOffset = tmpUnsafe.arrayBaseOffset(double[].class);
-			} else {
-				if (TRACE) trace("kryo", "Running on Android platform. Use of sun.misc.Unsafe should be disabled");
 			}
 		} catch (java.lang.Exception e) {
-			if (TRACE)
-				trace("kryo", "sun.misc.Unsafe is not accessible or not available. Use of sun.misc.Unsafe should be disabled");
+			e.printStackTrace();
 		}
 
 		byteArrayBaseOffset = tmpByteArrayBaseOffset;
@@ -118,10 +112,6 @@ public class UnsafeUtil {
 		};
 
 		Arrays.sort(allFieldsArray, fieldOffsetComparator);
-
-		for (Field f : allFields) {
-			if (TRACE) trace("kryo", "Field '" + f.getName() + "' at offset " + unsafe().objectFieldOffset(f));
-		}
 		
 		return allFieldsArray;
 	}

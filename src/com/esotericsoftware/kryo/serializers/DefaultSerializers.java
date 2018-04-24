@@ -189,7 +189,7 @@ public class DefaultSerializers {
 				output.writeVarInt(NULL, true);
 				return;
 			}
-			BigInteger value = (BigInteger)object;
+			BigInteger value = object;
 			byte[] bytes = value.toByteArray();
 			output.writeVarInt(bytes.length + 1, true);
 			output.writeBytes(bytes);
@@ -204,7 +204,7 @@ public class DefaultSerializers {
 	}
 
 	static public class BigDecimalSerializer extends Serializer<BigDecimal> {
-		private BigIntegerSerializer bigIntegerSerializer = new BigIntegerSerializer();
+		private final BigIntegerSerializer bigIntegerSerializer = new BigIntegerSerializer();
 
 		{
 			setAcceptsNull(true);
@@ -216,7 +216,7 @@ public class DefaultSerializers {
 				output.writeVarInt(NULL, true);
 				return;
 			}
-			BigDecimal value = (BigDecimal)object;
+			BigDecimal value = object;
 			bigIntegerSerializer.write(kryo, output, value.unscaledValue());
 			output.writeInt(value.scale(), false);
 		}
@@ -555,7 +555,7 @@ public class DefaultSerializers {
 		// The default value of gregorianCutover.
 		static private final long DEFAULT_GREGORIAN_CUTOVER = -12219292800000L;
 
-		TimeZoneSerializer timeZoneSerializer = new TimeZoneSerializer();
+		final TimeZoneSerializer timeZoneSerializer = new TimeZoneSerializer();
 
 		public void write (Kryo kryo, Output output, Calendar object) {
 			timeZoneSerializer.write(kryo, output, object.getTimeZone()); // can't be null
@@ -692,9 +692,7 @@ public class DefaultSerializers {
 		}
 
 		protected static boolean isSameLocale(Locale locale, String language, String country, String variant) {
-			if (locale==null)
-				return false;
-			return (locale.getLanguage().equals(language) && locale.getCountry().equals(country) && locale.getVariant().equals(variant));
+			return locale != null && (locale.getLanguage().equals(language) && locale.getCountry().equals(country) && locale.getVariant().equals(variant));
 		}
 	}
 }

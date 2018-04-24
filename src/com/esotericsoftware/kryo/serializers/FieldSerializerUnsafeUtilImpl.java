@@ -1,21 +1,19 @@
 package com.esotericsoftware.kryo.serializers;
 
-import static com.esotericsoftware.kryo.util.UnsafeUtil.unsafe;
-import static com.esotericsoftware.minlog.Log.TRACE;
-import static com.esotericsoftware.minlog.Log.trace;
-
-import java.lang.reflect.Field;
-import java.util.List;
-
 import com.esotericsoftware.kryo.serializers.FieldSerializer.CachedField;
 import com.esotericsoftware.kryo.serializers.UnsafeCacheFields.UnsafeRegionField;
 import com.esotericsoftware.kryo.util.IntArray;
 import com.esotericsoftware.reflectasm.FieldAccess;
 
+import java.lang.reflect.Field;
+import java.util.List;
+
+import static com.esotericsoftware.kryo.util.UnsafeUtil.unsafe;
+
 /* Helper class for implementing FieldSerializer using Unsafe-based approach. 
  * @author Roman Levenstein <romixlev@gmail.com> */
 final class FieldSerializerUnsafeUtilImpl implements FieldSerializerUnsafeUtil {
-	private FieldSerializer serializer;
+	private final FieldSerializer serializer;
 
 	public FieldSerializerUnsafeUtilImpl (FieldSerializer serializer) {
 		this.serializer = serializer;
@@ -50,18 +48,12 @@ final class FieldSerializerUnsafeUtilImpl implements FieldSerializerUnsafeUtil {
 				endPrimitives = lastFieldEndOffset;
 				lastWasPrimitive = false;
 				if (primitiveLength > 1) {
-					if (TRACE)
-						trace("kryo", "Class " + serializer.getType().getName()
-							+ ". Found a set of consecutive primitive fields. Number of fields = " + primitiveLength
-							+ ". Byte length = " + (endPrimitives - startPrimitives) + " Start offset = " + startPrimitives
-							+ " endOffset=" + endPrimitives);
 					// TODO: register a region instead of a field
 					CachedField cf = new UnsafeRegionField(startPrimitives, (endPrimitives - startPrimitives));
 					cf.field = lastField;
 					cachedFields.add(cf);
 				} else {
-					if (lastField != null)
-						cachedFields.add(serializer.newCachedField(lastField, cachedFields.size(), lastAccessIndex));
+					cachedFields.add(serializer.newCachedField(lastField, cachedFields.size(), lastAccessIndex));
 				}
 				cachedFields.add(serializer.newCachedField(field, cachedFields.size(), accessIndex));
 			} else if (!field.getType().isPrimitive()) {
@@ -84,17 +76,12 @@ final class FieldSerializerUnsafeUtilImpl implements FieldSerializerUnsafeUtil {
 		if (!serializer.getUseAsmEnabled() && serializer.getUseMemRegions() && lastWasPrimitive) {
 			endPrimitives = lastFieldEndOffset;
 			if (primitiveLength > 1) {
-				if (TRACE) {
-					trace("kryo", "Class " + serializer.getType().getName()
-						+ ". Found a set of consecutive primitive fields. Number of fields = " + primitiveLength + ". Byte length = "
-						+ (endPrimitives - startPrimitives) + " Start offset = " + startPrimitives + " endOffset=" + endPrimitives);
-				}
 				// register a region instead of a field
 				CachedField cf = new UnsafeRegionField(startPrimitives, (endPrimitives - startPrimitives));
 				cf.field = lastField;
 				cachedFields.add(cf);
 			} else {
-				if (lastField != null) cachedFields.add(serializer.newCachedField(lastField, cachedFields.size(), lastAccessIndex));
+				cachedFields.add(serializer.newCachedField(lastField, cachedFields.size(), lastAccessIndex));
 			}
 		}
 	}

@@ -18,7 +18,7 @@ public class ObjectMap<K, V> {
 	private static final int PRIME2 = 0xb4b82e39;
 	private static final int PRIME3 = 0xced1c241;
 
-	static Random random = new Random();
+	static final Random random = new Random();
 
 	public int size;
 
@@ -595,7 +595,7 @@ public class ObjectMap<K, V> {
 	}
 
 	static public class Entries<K, V> extends MapIterator<K, V> implements Iterable<Entry<K, V>>, Iterator<Entry<K, V>> {
-		Entry<K, V> entry = new Entry();
+		final Entry<K, V> entry = new Entry();
 
 		public Entries (ObjectMap<K, V> map) {
 			super(map);

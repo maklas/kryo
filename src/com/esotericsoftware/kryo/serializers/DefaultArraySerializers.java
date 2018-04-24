@@ -1,22 +1,16 @@
 
 package com.esotericsoftware.kryo.serializers;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.TypeVariable;
-import java.util.Arrays;
-
-import com.esotericsoftware.kryo.Generics;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Registration;
 import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 
-import static com.esotericsoftware.kryo.Kryo.*;
-import static com.esotericsoftware.minlog.Log.TRACE;
-import static com.esotericsoftware.minlog.Log.trace;
+import java.lang.reflect.Array;
+import java.lang.reflect.Modifier;
+
+import static com.esotericsoftware.kryo.Kryo.NULL;
 
 /** Contains many serializer classes for specific array types that are provided by {@link Kryo#addDefaultSerializer(Class, Class)
  * default}.
@@ -405,7 +399,6 @@ public class DefaultArraySerializers{
 		}
 		
 		public void setGenerics(Kryo kryo, Class[] generics) {
-			if(TRACE) trace("kryo", "setting generics for ObjectArraySerializer");
 			this.generics = generics;
 		}
 	}

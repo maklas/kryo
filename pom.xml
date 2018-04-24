@@ -53,28 +53,15 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>com.esotericsoftware.minlog</groupId>
-			<artifactId>minlog</artifactId>
-			<version>1.2</version>
-		</dependency>
-		<dependency>
 			<groupId>org.objenesis</groupId>
 			<artifactId>objenesis</artifactId>
 			<version>2.1</version>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.8.2</version>
-			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
 	<build>
 		<!-- Set nonstandard source and test source dirs -->
 		<sourceDirectory>src</sourceDirectory>
-		<testSourceDirectory>test</testSourceDirectory>
-
 		<pluginManagement>
 			<plugins>
 				<plugin>
